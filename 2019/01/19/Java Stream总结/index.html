@@ -8,7 +8,7 @@
   
   
   
-  <title>Java Stream总结 | 零下博客</title>
+  <title>Java Stream总结(创建和转换) | 零下博客</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -183,7 +183,7 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>Java Stream总结</span>
+    <span>Java Stream总结(创建和转换)</span>
   </h1>
   <div class="article-top-meta">
     <span>
@@ -209,8 +209,40 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h2 id="Stream创建"><a href="#Stream创建" class="headerlink" title="Stream创建"></a>Stream创建</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span></span>&#123;</span><br><span class="line"> </span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Stream转换"><a href="#Stream转换" class="headerlink" title="Stream转换"></a>Stream转换</h2>
+      <h2 id="一-Stream创建"><a href="#一-Stream创建" class="headerlink" title="一. Stream创建"></a>一. Stream创建</h2><ol>
+<li><p>由集合创建，如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List.stream();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由数组创建,如: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Array.Stream(array,from,to);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>从数组中位于from(包括)到to(不包括)的元素中创建一个流</p>
+<ol start="3">
+<li>Stream.of创建,如: <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Stream.of(T... values);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>of方法参数是一个可变长参数，可以创建具有任意数据量的流。</p>
+<ol start="4">
+<li>创建无限流,如: <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;String&gt; constantStream = Stream.generate(() -&gt; <span class="string">"S"</span>);</span><br><span class="line">Stream&lt;Double&gt; random = Stream.generate(Math::random);</span><br><span class="line">Stream&lt;BigInteger&gt; sequence = Stream.iterate(BigInteger.ZERO,n -&gt; n.add(BigInteger.ONE));</span><br><span class="line"></span><br><span class="line"> <span class="keyword">private</span> &lt;T&gt; <span class="function"><span class="keyword">void</span>  <span class="title">show</span><span class="params">(Stream&lt;T&gt; stream)</span></span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> SIZE =<span class="number">10</span>;</span><br><span class="line">        List&lt;T&gt; firstElements = stream.limit(SIZE+<span class="number">1</span>).collect(Collectors.toList());</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;firstElements.size();i++)&#123;</span><br><span class="line">            System.out.println(firstElements.get(i));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>Stream有两个创建无限流的静态方法generate、iterate,比其他流创建方式要稍微复杂一点。generate方法接受一个不包含任何引元的函数(一个Supplier<t> 接口的对象)，任何时候，只要需要一个流类型的值，该函数就会被调用产生一个这样的值，如上第一个示例每次调用都产生一个”S”的字符串，第二个示例每次调用都产生一个新的随机数。使用iterate方法产生一个无限流，它会接受一个”种子”值，如以上例子中的BigInteger.ZERO,和一个函数(一个UnaryOperator<t> 接口的对象),会反复调用该函数应用到之前的结果上，如上示例会每次产生比上一结果增加1的序列。以上三种方式产生的无限流都可以用show方法打印出值。</t></t></p>
+<ol start="5">
+<li><p>创建不带任何元素的stream,如: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Stream.empty();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>文件读取生成流,如: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (Stream&lt;String&gt; lines = Files.lines(path, StandardCharsets.UTF_8));</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>通过读取文件产生一个流，它的元素是指定文件中的行，这个流也可以使用上面的show方法来显示数据。</p>
+<p>流的创建和产生也还有其他一些方法，比如Pattern 的splitAsStream(final CharSequence input)方法。</p>
+<h2 id="二-Stream转换"><a href="#二-Stream转换" class="headerlink" title="二. Stream转换"></a>二. Stream转换</h2><p>流的转换会产生一个新的流，它的元素会根据规则产生成新的流的元素。</p>
+<ol>
+<li>filter</li>
+</ol>
+<h3 id="未完待续………………"><a href="#未完待续………………" class="headerlink" title="未完待续……………….."></a>未完待续………………..</h3>
     </div>
   </div>
   
